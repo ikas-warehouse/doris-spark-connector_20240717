@@ -111,8 +111,8 @@ private[spark] object SchemaUtils {
       case "DOUBLE"          => DataTypes.DoubleType
       case "DATE"            => DataTypes.DateType
       case "DATEV2"          => DataTypes.DateType
-      case "DATETIME"        => DataTypes.StringType
-      case "DATETIMEV2"      => DataTypes.StringType
+      case "DATETIME"        => DataTypes.TimestampType
+      case "DATETIMEV2"      => DataTypes.TimestampType
       case "BINARY"          => DataTypes.BinaryType
       case "DECIMAL"         => DecimalType(precision, scale)
       case "CHAR"            => DataTypes.StringType
@@ -164,8 +164,8 @@ private[spark] object SchemaUtils {
         case DoubleType => row.getDouble(ordinal)
         case StringType => Option(row.getUTF8String(ordinal)).map(_.toString).getOrElse(DataUtil.NULL_VALUE)
         case TimestampType =>
-          DateTimeUtils.toJavaTimestamp(row.getLong(ordinal)).toString
-        case DateType => DateTimeUtils.toJavaDate(row.getInt(ordinal)).toString
+          DateTimeUtils.toJavaTimestamp(row.getLong(ordinal))
+        case DateType => DateTimeUtils.toJavaDate(row.getInt(ordinal))
         case BinaryType => row.getBinary(ordinal)
         case dt: DecimalType => row.getDecimal(ordinal, dt.precision, dt.scale).toJavaBigDecimal
         case at: ArrayType =>
