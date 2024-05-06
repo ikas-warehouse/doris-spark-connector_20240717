@@ -48,9 +48,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.*;
 
 /**
@@ -64,7 +66,7 @@ public class RowBatch {
             .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
             .toFormatter();
 
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static class Row {
         private final List<Object> cols;
@@ -338,8 +340,14 @@ public class RowBatch {
                                 }
                                 try {
                                     String value = new String(varCharVector.get(rowIndex), StandardCharsets.UTF_8);
-                                    addValueToRow(rowIndex, new Timestamp(dateFormat.parse(value).getTime()));
-                                } catch (ParseException e) {
+                                    if (value.equals("")){
+                                        addValueToRow(rowIndex, null);
+                                        continue;
+                                    }
+                                    LocalDateTime instant = LocalDateTime.parse(value, dateFormat);
+                                    addValueToRow(rowIndex, DateTimeUtils.toJavaTimestamp(instant.getLong(ChronoField.MICRO_OF_SECOND)));
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                     throw new RuntimeException(e);
                                 }
                             }
