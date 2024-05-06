@@ -30,7 +30,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.doris.sdk.thrift.TScanBatchResult;
 import org.apache.doris.spark.exception.DorisException;
 import org.apache.doris.spark.rest.models.Schema;
-import org.apache.spark.sql.catalyst.util.DateTimeUtils;
 import org.apache.spark.sql.types.Decimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,16 +42,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.*;
 
 /**
@@ -340,12 +333,16 @@ public class RowBatch {
                                 }
                                 try {
                                     String value = new String(varCharVector.get(rowIndex), StandardCharsets.UTF_8);
-                                    if (value.equals("")){
+                                    if (value.equals("")) {
                                         addValueToRow(rowIndex, null);
                                         continue;
                                     }
-                                    LocalDateTime instant = LocalDateTime.parse(value, dateFormat);
-                                    addValueToRow(rowIndex, DateTimeUtils.toJavaTimestamp(instant.getLong(ChronoField.MICRO_OF_SECOND)));
+                                    LocalDateTime dateTime = LocalDateTime.parse(value, dateFormat);
+                                    // 转换为ZonedDateTime，默认时区
+                                    ZonedDateTime zonedDateTime = dateTime.atZone(ZoneId.systemDefault());
+                                    // 转换为Instant
+                                    java.time.Instant instant = zonedDateTime.toInstant();
+                                    addValueToRow(rowIndex, Timestamp.from(instant));
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                     throw new RuntimeException(e);
@@ -371,7 +368,7 @@ public class RowBatch {
                                 // LocalDateTime dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
                                 // String formatted = DATE_TIME_FORMATTER.format(dateTime);
                                 // addValueToRow(rowIndex, formatted);
-                                addValueToRow(rowIndex, DateTimeUtils.toJavaTimestamp(instant.getLong(ChronoField.MICRO_OF_SECOND)));
+                                addValueToRow(rowIndex, Timestamp.from(instant));
                             }
                         }
                         break;
