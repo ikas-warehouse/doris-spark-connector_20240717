@@ -70,7 +70,8 @@
         <revision>1.4.0-SNAPSHOT</revision>
         <spark.version>3.3.0</spark.version>
         <spark.major.version>3.3</spark.major.version>
-        <scala.version>2.12</scala.version>
+        <scala.version>2.12.10</scala.version>
+        <scala.major.version>2.12</scala.major.version>
         <libthrift.version>0.16.0</libthrift.version>
         <arrow.version>7.0.0</arrow.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -86,6 +87,12 @@
             <groupId>org.apache.doris</groupId>
             <artifactId>thrift-service</artifactId>
             <version>${thrift-service.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>
@@ -96,14 +103,14 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.version}</artifactId>
+            <artifactId>spark-core_${scala.major.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.version}</artifactId>
+            <artifactId>spark-sql_${scala.major.version}</artifactId>
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -152,7 +159,7 @@
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-scala_${scala.version}</artifactId>
+            <artifactId>mockito-scala_${scala.major.version}</artifactId>
             <version>1.4.7</version>
             <exclusions>
                 <exclusion>
@@ -178,7 +185,7 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql-kafka-0-10_${scala.version}</artifactId>
+            <artifactId>spark-sql-kafka-0-10_${scala.major.version}</artifactId>
             <version>${spark.version}</version>
             <scope>test</scope>
         </dependency>
@@ -203,7 +210,7 @@
 
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_${scala.version}</artifactId>
+            <artifactId>jackson-module-scala_${scala.major.version}</artifactId>
             <version>${fasterxml.jackson.version}</version>
         </dependency>
 
@@ -227,6 +234,21 @@
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.scala-lang/scala-library -->
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -325,6 +347,10 @@
                             <relocation>
                                 <pattern>org.apache.thrift</pattern>
                                 <shadedPattern>org.apache.doris.shaded.org.apache.thrift</shadedPattern>
+                            </relocation>
+                            <relocation>
+                                <pattern>org.apache.http</pattern>
+                                <shadedPattern>org.apache.doris.shaded.org.apache.http</shadedPattern>
                             </relocation>
                         </relocations>
                     </configuration>
