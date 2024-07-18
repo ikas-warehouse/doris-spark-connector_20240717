@@ -73,7 +73,7 @@
         <scala.version>2.12.10</scala.version>
         <scala.major.version>2.12</scala.major.version>
         <libthrift.version>0.16.0</libthrift.version>
-        <arrow.version>7.0.0</arrow.version>
+        <arrow.version>13.0.0</arrow.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.scm.id>github</project.scm.id>
         <netty.version>4.1.77.Final</netty.version>
@@ -139,14 +139,13 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                 </exclusion>
             </exclusions>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.arrow</groupId>
             <artifactId>arrow-memory-netty</artifactId>
             <version>${arrow.version}</version>
-            <scope>provided</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!--Test-->
@@ -328,6 +327,10 @@
                             </excludes>
                         </artifactSet>
                         <relocations>
+                            <relocation>
+                                <pattern>org.apache.arrow</pattern>
+                                <shadedPattern>org.apache.doris.shaded.org.apache.arrow</shadedPattern>
+                            </relocation>
                             <relocation>
                                 <pattern>io.netty</pattern>
                                 <shadedPattern>org.apache.doris.shaded.io.netty</shadedPattern>
